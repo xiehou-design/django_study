@@ -1,0 +1,138 @@
+s4day78
+	- 回顾：Web框架 - Django
+	
+今日内容：
+	1. Form组件
+		- 校验
+		- 保留上次输入内容（生成HTML标签）
+		
+		class Foo(Form)：
+			user = fields.CharField()# 验证规则，HTML标签插件
+			
+		obj = Foo(data = request.POST) # 有HTML标签，含有错误信息
+		obj = Foo(intial = {})		   # 只有HTML标签
+		obj.is_valid()
+		obj.errors
+		obj.cleaned_data
+		
+		a. 多对多
+			- ChoiceField(可被替代)
+			- MultiplChoiceField
+		b. 常用插件
+			- CheckBox
+			- radio
+			- input
+			- textarea
+			- File
+			
+			
+			Select框：
+				单选
+					cls_id = fields.IntegerField(
+						# widget=widgets.Select(choices=[(1,'上海'),(2,'北京')])
+						widget=widgets.Select(choices=models.Classes.objects.values_list('id','title'),attrs={'class': 'form-control'})
+					)
+					
+					cls_id = fields.ChoiceField(
+						choices=models.Classes.objects.values_list('id','title'),
+						widget=widgets.Select(attrs={'class': 'form-control'})
+					)
+					
+					
+					obj = FooForm({'cls_id':1})
+				多选
+					xx = fields.MultipleChoiceField(
+						choices=models.Classes.objects.values_list('id','title'),
+						widget=widgets.SelectMultiple
+					)
+					
+					obj = FooForm({'cls_id':[1,2,3]})
+				
+					
+			修复Bug，刷新无法动态显示数据库内容：
+				方式一：
+					class TeacherForm(Form):
+						tname = fields.CharField(min_length=2)
+						# xx = form_model.ModelMultipleChoiceField(queryset=models.Classes.objects.all())
+						# xx = form_model.ModelChoiceField(queryset=models.Classes.objects.all())
+
+				方式二：
+					class TeacherForm(Form):
+						tname = fields.CharField(min_length=2)
+
+						xx = fields.MultipleChoiceField(
+							widget=widgets.SelectMultiple
+						)
+						def __init__(self,*args,**kwargs):
+							super(TeacherForm,self).__init__(*args,**kwargs)
+							self.fields['xx'].widget.choices = models.Classes.objects.values_list('id','title')
+						
+			
+		c. 扩展
+			- is_valid
+				- 字段 = 默认正则表达式
+					 - 额外的正则
+						from django.forms import Form
+						from django.forms import widgets
+						from django.forms import fields
+						from django.core.validators import RegexValidator
+						 
+						class MyForm(Form):
+							user = fields.CharField(
+								validators=[RegexValidator(r'^[0-9]+$', '请输入数字'), RegexValidator(r'^159[0-9]+$', '数字必须以159开头')],
+							)
+				- clean_字段，必须返回值
+				- clean()  
+					有返回值：cleaned_data = 返回值
+					无返回值：cleaned_data = 原来的值
+			
+			
+			
+总结：
+
+	1. 使用
+		class Foo:
+			xx = xxxxxx() # 正则，插件
+			
+			
+			def clean_xx():
+				..
+				
+				
+			def clean():
+				pass
+				
+	2. 页面展示
+		obj = Foo()
+		obj = Foo(init..)
+		
+		# 灵活
+			<form>
+				{{obj.xx}}
+				{{obj.xx}}
+				{{obj.xx}}
+				{{obj.xx}}
+			</form>
+		# 简单
+			{{obj.as_p}}
+			<ul>
+				{{obj.as_ul}}
+			</ul>
+			<table>
+				{{obj.as_table}}
+			</table>
+
+	3. 后台
+		is_valid()
+		clean_data
+		errors
+			
+	2. 上传文件
+	
+	3. Ajax
+		- 原生Ajax
+		- jQuery Ajax
+		- 伪Ajax
+		
+	
+	

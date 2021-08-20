@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    <form method="POST" action="/add_teacher/">
+        {% csrf_token %}
+
+        <p>
+            姓名：{{ obj.tname }}
+        </p>
+        <p>
+            班级：{{ obj.xx }}
+        </p>
+        <input type="submit" value="提交" />
+    </form>
+</body>
+</html>
